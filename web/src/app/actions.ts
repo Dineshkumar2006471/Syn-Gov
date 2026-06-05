@@ -88,7 +88,7 @@ export async function createProposal(data: any) {
     try {
       const tx = await loggerContract.logProposal(result[0].id, data.title.substring(0, 32))
       console.log('Proposal logged to blockchain. Tx Hash:', tx.hash)
-    } catch (e) {
+    } catch (e: any) {
       console.log('Web3 logging failed (is local node running?):', e.message)
     }
 
@@ -109,7 +109,7 @@ export async function castVote(proposalId: string, voteType: string, weightUsed:
     try {
       const tx = await loggerContract.logVote(proposalId, userId, voteType, weightUsed)
       console.log('Vote logged to blockchain. Tx Hash:', tx.hash)
-    } catch (e) {
+    } catch (e: any) {
       console.log('Web3 logging failed (is local node running?):', e.message)
     }
     
