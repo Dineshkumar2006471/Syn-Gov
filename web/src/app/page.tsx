@@ -13,7 +13,8 @@ export default function Home() {
         </div>
 
         <div className="container-wide">
-          <div className="hero-content">
+          {/* Desktop Hero */}
+          <div className="hero-content hide-mobile-hero">
 
             <div className="hero-text">
               <p className="text-overline hero-anim-1">Built for college communities</p>
@@ -56,6 +57,37 @@ export default function Home() {
             </div>
 
           </div>
+
+          {/* Mobile Hero */}
+          <div className="show-mobile-hero">
+            <div className="hero-text" style={{ textAlign: 'center', paddingTop: '20px' }}>
+              <h1 className="text-display hero-anim-1" style={{ fontSize: '3rem', lineHeight: '1.1' }}>Your Club.<br/>Your Rules.</h1>
+              <p className="text-body-lg hero-anim-2" style={{ marginTop: '16px', color: 'var(--text-muted)' }}>
+                Governance without the drama.
+              </p>
+              
+              <div className="mobile-interactive-card hero-anim-3" style={{ margin: '40px auto', background: '#fff', borderRadius: '16px', padding: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.1)', border: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                  <div className="pulse-dot"></div>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--success)' }}>AI Approved</span>
+                </div>
+                <h4 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '8px', textAlign: 'left' }}>Annual Tech Hackathon</h4>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', textAlign: 'left', marginBottom: '16px' }}>Requested Budget: $500</p>
+                <div style={{ height: '8px', background: 'var(--surface-raised)', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{ width: '85%', height: '100%', background: 'var(--success)' }}></div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '0.75rem', fontWeight: 600 }}>
+                  <span style={{ color: 'var(--success)' }}>85% Yes</span>
+                  <span style={{ color: 'var(--text-subtle)' }}>15% No</span>
+                </div>
+              </div>
+
+              <div className="hero-buttons hero-anim-4" style={{ justifyContent: 'center' }}>
+                <Link href="/login" className="btn btn-primary-lg" style={{ width: '100%' }}>Get Started Free</Link>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 

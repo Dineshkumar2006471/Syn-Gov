@@ -63,7 +63,7 @@
   --font-mono: 'JetBrains Mono', monospace;
 
   /* Nav */
-  --nav-height: 72px;
+  --nav-height: 150px;
   --sidebar-width: 260px;
 }
 
@@ -2707,7 +2707,13 @@ select {
   display: none;
 }
 
-/* ── Mobile PWA Navigation ── */
+.hide-mobile-hero {
+  display: flex;
+}
+
+.show-mobile-hero {
+  display: none;
+}
 .bottom-nav {
   display: none;
   position: fixed;
@@ -2777,6 +2783,14 @@ select {
   
   .hide-mobile {
     display: none !important;
+  }
+
+  .hide-mobile-hero {
+    display: none !important;
+  }
+
+  .show-mobile-hero {
+    display: block !important;
   }
 
   .show-mobile {
