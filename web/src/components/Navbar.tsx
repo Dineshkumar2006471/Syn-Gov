@@ -36,7 +36,7 @@ export default function Navbar({ user }: { user?: { name: string, email: string 
     <nav className="navbar" style={{ boxShadow: scrolled ? '0 1px 8px rgba(0,0,0,0.06)' : 'none' }}>
       <div className="navbar-inner">
         <Link href="/" className="navbar-logo">
-          <img src="/images/syn-gov-logo.png" alt="SynGov Logo" className="navbar-logo-img" style={{ width: '128px', height: 'auto' }} />
+          <img src="/images/syn-gov-logo.png" alt="SynGov Logo" className="navbar-logo-img" style={{ width: '200px', height: 'auto', maxHeight: '56px', objectFit: 'contain' }} />
         </Link>
 
         {/* Desktop Links */}
