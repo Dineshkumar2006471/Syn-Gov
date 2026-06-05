@@ -78,7 +78,7 @@ export default async function Analytics() {
             </div>
           </div>
 
-          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px'}}>
+          <div className="analytics-grid" style={{marginBottom: '32px'}}>
             <div className="chart-card">
               <div className="chart-header">
                 <h3 className="text-h4">Proposals by Category</h3>
@@ -141,7 +141,7 @@ export default async function Analytics() {
             </div>
           </div>
 
-          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px'}}>
+          <div className="analytics-grid">
             <div className="chart-card">
               <div className="chart-header">
                 <h3 className="text-h4">Proposal Outcomes</h3>

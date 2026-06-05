@@ -8,6 +8,7 @@ export default function Navbar({ user }: { user?: { name: string, email: string 
   const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [avatarOpen, setAvatarOpen] = useState(false)
   
   const [localUser, setLocalUser] = useState<{ name: string, email: string } | null>(user || null)
   const [isLoadingUser, setIsLoadingUser] = useState(user === undefined)
@@ -52,13 +53,36 @@ export default function Navbar({ user }: { user?: { name: string, email: string 
         <div className="navbar-right-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div className="navbar-actions" style={{ display: 'flex' }}>
             {isLoadingUser ? null : localUser ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <span className="hide-mobile" style={{ fontSize: '0.875rem', fontWeight: 500 }}>{localUser.name}</span>
-                <button onClick={async () => {
-                  const { logout } = await import('@/app/auth-actions')
-                  await logout()
-                  window.location.href = '/'
-                }} className="btn btn-ghost btn-sm">Log Out</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', position: 'relative' }}>
+                <div 
+                  className="user-avatar-circle"
+                  onClick={() => setAvatarOpen(!avatarOpen)}
+                  style={{
+                    width: '40px', height: '40px', borderRadius: '50%', background: 'var(--accent)',
+                    color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', userSelect: 'none'
+                  }}
+                >
+                  {localUser.name ? localUser.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U'}
+                </div>
+                {avatarOpen && (
+                  <div className="avatar-dropdown" style={{
+                    position: 'absolute', top: '120%', right: '0', background: '#fff',
+                    boxShadow: 'var(--shadow-card)', borderRadius: 'var(--radius-sm)',
+                    padding: '8px', zIndex: 100, border: '1px solid var(--border)', minWidth: '150px'
+                  }}>
+                    <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border)', marginBottom: '4px' }}>
+                      <p className="text-body-sm" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{localUser.name}</p>
+                    </div>
+                    <button onClick={async () => {
+                      const { logout } = await import('@/app/auth-actions')
+                      await logout()
+                      window.location.href = '/'
+                    }} className="btn btn-ghost btn-sm" style={{ width: '100%', textAlign: 'left', justifyContent: 'flex-start' }}>
+                      Log Out
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <div style={{ display: 'flex', gap: '8px' }}>

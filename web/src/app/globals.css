@@ -1183,6 +1183,13 @@ select {
 
 
 
+/* Analytics Grid */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
 /* Features grid */
 .features-grid {
   display: grid;
@@ -2498,7 +2505,9 @@ select {
     grid-template-columns: 1fr;
   }
 
-  .features-grid {
+  .features-grid,
+  .analytics-grid,
+  .benefits-grid {
     grid-template-columns: 1fr;
   }
 
@@ -2786,7 +2795,11 @@ select {
   }
 
   .navbar-logo {
-    margin-left: -10px;
+    margin-left: -20px;
+  }
+
+  :root {
+    --nav-height: 130px;
   }
 
   .hide-mobile-hero {

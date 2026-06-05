@@ -27,7 +27,7 @@ export default async function Proposals() {
                 {proposals ? proposals.length : 24} total proposals
               </p>
             </div>
-            <a href="/proposals/create" className="btn btn-primary">+ New Proposal</a>
+            <a href="/create-proposal" className="btn btn-primary">+ New Proposal</a>
           </div>
 
           {/* Filters */}
