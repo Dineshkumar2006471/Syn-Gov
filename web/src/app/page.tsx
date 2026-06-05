@@ -17,7 +17,10 @@ export default function Home() {
 
             <div className="hero-text">
               <p className="text-overline hero-anim-1">Built for college communities</p>
-              <h1 className="text-display hero-anim-2">Governance that works for everyone</h1>
+              <h1 className="text-display hero-anim-2">
+                <span className="hide-mobile">Governance that works for everyone</span>
+                <span className="show-mobile">Decisions,<br/>Simplified.</span>
+              </h1>
               <p className="text-body-lg hero-anim-3">
                 SynGov gives your club the structure to make decisions together — fairly, transparently, and without drama. AI simplifies proposals. Your contributions shape your influence.
               </p>

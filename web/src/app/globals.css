@@ -2703,6 +2703,10 @@ select {
   display: none;
 }
 
+.show-mobile {
+  display: none;
+}
+
 /* ── Mobile PWA Navigation ── */
 .bottom-nav {
   display: none;
@@ -2773,6 +2777,15 @@ select {
   
   .hide-mobile {
     display: none !important;
+  }
+
+  .show-mobile {
+    display: inline !important;
+  }
+
+  .text-display {
+    font-size: 2.5rem;
+    font-weight: 700;
   }
 
   .nav-toggle {
