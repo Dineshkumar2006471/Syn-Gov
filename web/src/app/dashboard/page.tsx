@@ -1,5 +1,6 @@
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
+import BottomNav from "@/components/BottomNav";
 import { supabase } from '@/lib/supabase'
 import { getUser } from '@/app/auth-actions'
 
@@ -21,6 +22,7 @@ export default async function Dashboard() {
       <Navbar user={user} />
       <div className="app-layout">
         <Sidebar user={user} />
+        <BottomNav />
         <main className="main-content">
           <div className="dashboard-header">
             <img src="/images/team-discussion.png" alt="Team collaboration" />

@@ -1,6 +1,7 @@
 'use client'
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
+import BottomNav from "@/components/BottomNav";
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { generateProposalSummary, createProposal } from '@/app/actions'
@@ -55,6 +56,7 @@ export default function CreateProposal() {
       <Navbar />
       <div className="app-layout">
         <Sidebar />
+        <BottomNav />
         <main className="main-content">
           <div className="mb-32">
             <h1 className="text-h1 mb-8">Create a Proposal</h1>

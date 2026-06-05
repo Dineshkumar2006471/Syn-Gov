@@ -1,5 +1,6 @@
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
+import BottomNav from "@/components/BottomNav";
 import { getUser } from '@/app/auth-actions'
 
 export default async function Members() {
@@ -9,6 +10,7 @@ export default async function Members() {
       <Navbar user={user} />
       <div className="app-layout">
         <Sidebar user={user} />
+        <BottomNav />
         <main className="main-content">
           <div className="dashboard-header">
             <img src="/images/hero-collab.png" alt="Community members" />

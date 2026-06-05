@@ -1,6 +1,7 @@
 'use client'
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
+import BottomNav from "@/components/BottomNav";
 import { useState, useEffect, use } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
@@ -104,6 +105,7 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
         <Navbar />
         <div className="app-layout">
           <Sidebar />
+        <BottomNav />
           <main className="main-content">
             <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading proposal...</div>
           </main>
@@ -118,6 +120,7 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
         <Navbar />
         <div className="app-layout">
           <Sidebar />
+        <BottomNav />
           <main className="main-content">
             <div style={{ padding: '40px', textAlign: 'center', color: 'var(--danger)' }}>Proposal not found.</div>
           </main>
@@ -133,6 +136,7 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
       <Navbar />
       <div className="app-layout">
         <Sidebar />
+        <BottomNav />
         <main className="main-content">
           <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontSize: '0.8125rem'}}>
             <Link href="/proposals" style={{color: 'var(--text-muted)'}}>Proposals</Link>

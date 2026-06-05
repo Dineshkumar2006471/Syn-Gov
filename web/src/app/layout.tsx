@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Sora, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import ClientInteractions from "@/components/ClientInteractions";
@@ -21,9 +21,23 @@ const fontMono = JetBrains_Mono({
   preload: false,
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#09090b"
+};
+
 export const metadata: Metadata = {
   title: "SynGov — Governance That Works for Everyone",
   description: "SynGov gives your college club the structure to make decisions together — fairly, transparently, and without drama. AI-powered proposals, weighted voting, blockchain transparency.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "SynGov"
+  }
 };
 
 export default function RootLayout({

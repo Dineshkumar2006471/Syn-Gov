@@ -1,5 +1,6 @@
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
+import BottomNav from "@/components/BottomNav";
 import ProposalCard from '@/components/ProposalCard'
 import { supabase } from '@/lib/supabase'
 
@@ -16,6 +17,7 @@ export default async function Proposals() {
       <Navbar />
       <div className="app-layout">
         <Sidebar />
+        <BottomNav />
         
         <main className="main-content">
           <div className="page-header">
