@@ -2785,6 +2785,10 @@ select {
     display: none !important;
   }
 
+  .navbar-logo {
+    margin-left: -10px;
+  }
+
   .hide-mobile-hero {
     display: none !important;
   }
