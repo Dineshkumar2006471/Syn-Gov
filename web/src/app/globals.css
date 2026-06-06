@@ -2848,3 +2848,337 @@ select {
     pointer-events: auto;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   VotingPanel Component
+   ═══════════════════════════════════════════════════════════════ */
+
+.voting-panel {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+}
+
+.voting-panel-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.voting-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.voting-stat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.voting-stat-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.voting-expertise-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--success);
+  background: #D1FAE5;
+  border-radius: 99px;
+  letter-spacing: 0.3px;
+}
+
+/* Countdown */
+.voting-countdown {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+}
+
+.voting-countdown-icon {
+  font-size: 1rem;
+}
+
+.voting-countdown-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.voting-countdown-text.expired {
+  color: var(--danger);
+}
+
+/* Progress Bars */
+.voting-progress-section {
+  margin-bottom: 24px;
+}
+
+.voting-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.voting-yes-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--success);
+}
+
+.voting-no-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--danger);
+}
+
+.voting-progress-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #E5E7EB;
+}
+
+.voting-progress-yes {
+  height: 100%;
+  background: var(--success);
+  transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 6px 0 0 6px;
+}
+
+.voting-progress-no {
+  height: 100%;
+  background: var(--danger);
+  transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0 6px 6px 0;
+}
+
+.voting-progress-weights {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* Vote Buttons */
+.voting-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.voting-btn {
+  flex: 1;
+  padding: 14px 16px;
+  border: 2px solid;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 200ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+}
+
+.voting-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.voting-btn-yes {
+  background: #D1FAE5;
+  border-color: var(--success);
+  color: #065F46;
+}
+
+.voting-btn-yes:hover:not(:disabled) {
+  background: var(--success);
+  color: #fff;
+}
+
+.voting-btn-no {
+  background: #FEE2E2;
+  border-color: var(--danger);
+  color: #991B1B;
+}
+
+.voting-btn-no:hover:not(:disabled) {
+  background: var(--danger);
+  color: #fff;
+}
+
+.voting-btn-abstain {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.voting-btn-abstain:hover:not(:disabled) {
+  background: var(--text-subtle);
+  color: #fff;
+}
+
+/* Spinner */
+.voting-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(0, 0, 0, 0.15);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: voting-spin 0.6s linear infinite;
+}
+
+@keyframes voting-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Vote Confirmation */
+.voting-confirmation {
+  text-align: center;
+  padding: 20px;
+  background: #D1FAE5;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+
+.voting-confirmation-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.voting-confirmation-text {
+  font-size: 0.9375rem;
+  color: #065F46;
+  margin: 0;
+}
+
+.vote-yes { color: var(--success); }
+.vote-no { color: var(--danger); }
+.vote-abstain { color: var(--text-secondary); }
+
+.voting-confirmation-bonus {
+  margin: 8px 0 0;
+  font-size: 0.8125rem;
+  color: var(--success);
+  font-weight: 600;
+}
+
+/* Closed message */
+.voting-closed-msg {
+  text-align: center;
+  padding: 16px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+
+.voting-closed-msg p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+/* Error */
+.voting-error {
+  padding: 12px 16px;
+  background: #FEE2E2;
+  border: 1px solid #FECACA;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+
+.voting-error p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #991B1B;
+}
+
+/* Result Banner */
+.voting-result-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: var(--radius-sm);
+  flex-wrap: wrap;
+}
+
+.voting-result-banner.passed {
+  background: #D1FAE5;
+  border: 1px solid #A7F3D0;
+}
+
+.voting-result-banner.rejected {
+  background: #FEE2E2;
+  border: 1px solid #FECACA;
+}
+
+.voting-result-icon {
+  font-size: 1.5rem;
+}
+
+.voting-result-text {
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+}
+
+.voting-result-text strong {
+  font-weight: 800;
+}
+
+.voting-tx-link {
+  margin-left: auto;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 200ms;
+}
+
+.voting-tx-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .voting-buttons {
+    flex-direction: column;
+  }
+
+  .voting-result-banner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .voting-tx-link {
+    margin-left: 0;
+  }
+}
