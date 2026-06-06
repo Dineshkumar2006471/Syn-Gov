@@ -5,20 +5,16 @@ import BottomNav from "@/components/BottomNav";
 import { useState, useEffect, use } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
-import { castVote } from '@/app/actions'
+import VotingPanel from '@/components/VotingPanel'
 
 export default function ProposalDetail({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params)
   const [proposal, setProposal] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   
-  // Voting State
-  const [votesFor, setVotesFor] = useState(0)
-  const [votesAgainst, setVotesAgainst] = useState(0)
-  const [userVote, setUserVote] = useState<string | null>(null)
-  const [isVoting, setIsVoting] = useState(false)
-  
-  const totalVotes = votesFor + votesAgainst
+  // User Profile State
+  const [userProfile, setUserProfile] = useState<any>(null)
+  const [userVoteRecord, setUserVoteRecord] = useState<any>(null)
 
   const [newComment, setNewComment] = useState('')
   const [comments, setComments] = useState([
@@ -39,19 +35,49 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
   ])
 
   useEffect(() => {
-    async function fetchProposal() {
-      const { data, error } = await supabase
+    async function fetchData() {
+      // 1. Fetch Proposal
+      const { data: propData } = await supabase
         .from('proposals')
         .select('*')
         .eq('id', resolvedParams.id)
         .single()
       
-      if (data) {
-        setProposal(data)
+      if (propData) {
+        setProposal(propData)
       }
+
+      // 2. Fetch logged in user
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user?.email) {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('*')
+          .eq('email', session.user.email)
+          .single()
+        
+        if (profile) {
+          setUserProfile(profile)
+          
+          // 3. Check if user already voted
+          if (propData) {
+            const { data: vote } = await supabase
+              .from('votes')
+              .select('*')
+              .eq('proposal_id', propData.id)
+              .eq('user_id', profile.id)
+              .single()
+            
+            if (vote) {
+              setUserVoteRecord(vote)
+            }
+          }
+        }
+      }
+
       setLoading(false)
     }
-    fetchProposal()
+    fetchData()
   }, [resolvedParams.id])
 
   const handlePostComment = () => {
@@ -67,45 +93,13 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
     setNewComment('')
   }
 
-  const handleVote = async (type: 'for' | 'against' | 'abstain') => {
-    if (isVoting || userVote === type) return
-    setIsVoting(true)
-    
-    try {
-      // Optimistic UI Update
-      const oldVote = userVote
-      setUserVote(type)
-      
-      if (type === 'for') {
-        setVotesFor(prev => prev + 1)
-        if (oldVote === 'against') setVotesAgainst(prev => prev - 1)
-      } else if (type === 'against') {
-        setVotesAgainst(prev => prev + 1)
-        if (oldVote === 'for') setVotesFor(prev => prev - 1)
-      } else if (type === 'abstain') {
-        if (oldVote === 'for') setVotesFor(prev => prev - 1)
-        if (oldVote === 'against') setVotesAgainst(prev => prev - 1)
-      }
-
-      await castVote(resolvedParams.id, type, '1.20')
-      
-    } catch (error) {
-      console.error("Voting failed:", error)
-      alert("Failed to cast vote. Please try again.")
-      // Revert state on failure (simplified)
-      setUserVote(null) 
-    } finally {
-      setIsVoting(false)
-    }
-  }
-
   if (loading) {
     return (
       <>
         <Navbar />
         <div className="app-layout">
           <Sidebar />
-        <BottomNav />
+          <BottomNav />
           <main className="main-content">
             <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading proposal...</div>
           </main>
@@ -120,7 +114,7 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
         <Navbar />
         <div className="app-layout">
           <Sidebar />
-        <BottomNav />
+          <BottomNav />
           <main className="main-content">
             <div style={{ padding: '40px', textAlign: 'center', color: 'var(--danger)' }}>Proposal not found.</div>
           </main>
@@ -253,40 +247,31 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
             </div>
 
             <div className="detail-right" style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
-              <div className="vote-widget">
-                <div className="vote-widget-title">⚖️ Community Vote</div>
-                <div className="vote-weight-label">Your governance weight: <span>1.20×</span></div>
-
-                <div className="vote-results">
-                  <div className="vote-results-header">
-                    <span className="vote-for-label">For {totalVotes > 0 ? Math.round((votesFor / totalVotes) * 100) : 0}%</span>
-                    <span className="vote-against-label">Against {totalVotes > 0 ? Math.round((votesAgainst / totalVotes) * 100) : 0}%</span>
-                  </div>
-                  <div className="progress-bar" style={{height: '10px'}}>
-                    <div className="progress-bar-for" style={{width: `${totalVotes > 0 ? (votesFor / totalVotes) * 100 : 0}%`}}></div>
-                    <div className="progress-bar-against" style={{width: `${totalVotes > 0 ? (votesAgainst / totalVotes) * 100 : 0}%`}}></div>
-                  </div>
-                  <div className="vote-total">{totalVotes} total votes</div>
+              
+              {/* ── VOTING PANEL REPLACEMENT ── */}
+              {userProfile ? (
+                <VotingPanel 
+                  proposalId={proposal.id}
+                  proposalCategory={proposal.category || 'general'}
+                  proposalStatus={proposal.status || 'active'}
+                  deadline={proposal.deadline}
+                  weightedYes={parseFloat(proposal.weighted_yes || 0)}
+                  weightedNo={parseFloat(proposal.weighted_no || 0)}
+                  txHash={proposal.tx_hash}
+                  userId={userProfile.id}
+                  userName={userProfile.name}
+                  userContributionScore={userProfile.contribution_score || 0}
+                  userGovernanceWeight={userProfile.governance_weight || 1}
+                  userExpertiseTags={userProfile.expertise_tags || []}
+                  userHasVoted={!!userVoteRecord}
+                  userVoteType={userVoteRecord?.vote_type}
+                  userVoteWeight={userVoteRecord?.final_weight}
+                />
+              ) : (
+                <div className="card-flat" style={{textAlign: 'center', padding: '32px 16px'}}>
+                  <p style={{color: 'var(--text-muted)'}}>Please log in to view and participate in governance voting.</p>
                 </div>
-
-                <div className="vote-buttons" id="voteButtons" style={{ opacity: isVoting ? 0.7 : 1, pointerEvents: isVoting ? 'none' : 'auto' }}>
-                  <button 
-                    className={`vote-btn vote-btn-for ${userVote === 'for' ? 'active' : ''}`}
-                    onClick={() => handleVote('for')}
-                    style={userVote === 'for' ? { background: 'var(--success)', color: '#fff', borderColor: 'var(--success)' } : {}}
-                  >👍 For</button>
-                  <button 
-                    className={`vote-btn vote-btn-against ${userVote === 'against' ? 'active' : ''}`}
-                    onClick={() => handleVote('against')}
-                    style={userVote === 'against' ? { background: 'var(--danger)', color: '#fff', borderColor: 'var(--danger)' } : {}}
-                  >👎 Against</button>
-                  <button 
-                    className={`vote-btn vote-btn-abstain ${userVote === 'abstain' ? 'active' : ''}`}
-                    onClick={() => handleVote('abstain')}
-                    style={userVote === 'abstain' ? { background: 'var(--text-subtle)', color: '#fff', borderColor: 'var(--text-subtle)' } : {}}
-                  >— Abstain</button>
-                </div>
-              </div>
+              )}
 
               <div className="card-flat">
                 <h4 className="text-h4 mb-16">Details</h4>
@@ -314,14 +299,16 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
                 </div>
               </div>
 
-              <div className="card-flat" style={{borderColor: 'var(--accent-muted)', background: 'var(--accent-light)'}}>
-                <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px'}}>
-                  <span>🔗</span>
-                  <span className="text-body-sm" style={{fontWeight: 600, color: 'var(--accent)'}}>Blockchain Verified</span>
+              {/* Only show the blockchain manual link if the VotingPanel isn't already showing the banner with the link */}
+              {(!proposal.tx_hash) && (
+                <div className="card-flat" style={{borderColor: 'var(--accent-muted)', background: 'var(--accent-light)'}}>
+                  <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px'}}>
+                    <span>🔗</span>
+                    <span className="text-body-sm" style={{fontWeight: 600, color: 'var(--accent)'}}>Blockchain Connected</span>
+                  </div>
+                  <p className="text-caption" style={{color: 'var(--text-muted)', marginBottom: '8px'}}>This governance system leverages Polygon Amoy for transparent and immutable vote logging.</p>
                 </div>
-                <p className="text-caption" style={{color: 'var(--text-muted)', marginBottom: '8px'}}>This proposal is logged on Polygon Amoy for permanent transparency.</p>
-                <a href="#" className="text-caption" style={{color: 'var(--accent)', fontWeight: 500}}>View on Explorer →</a>
-              </div>
+              )}
             </div>
           </div>
         </main>
