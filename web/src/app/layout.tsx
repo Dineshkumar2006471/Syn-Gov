@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Sora, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import ClientInteractions from "@/components/ClientInteractions";
+import RealtimeInjector from "@/components/RealtimeInjector";
 
 const fontDisplay = Sora({
   subsets: ["latin"],
@@ -51,6 +52,7 @@ export default function RootLayout({
         <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>⚡</text></svg>" />
       </head>
       <body suppressHydrationWarning className={`${fontBody.variable} ${fontDisplay.variable} ${fontMono.variable} antialiased`}>
+        <RealtimeInjector />
         <ClientInteractions />
         {children}
       </body>
