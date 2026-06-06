@@ -25,9 +25,18 @@ export interface SendEmailResult {
 
 // ── Resend Client ───────────────────────────────────────────────────
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | null = null;
 
-const FROM_ADDRESS = process.env.RESEND_FROM_EMAIL ?? 'SynGov <noreply@syngov.app>';
+function getResend(): Resend {
+  if (!_resend) {
+    _resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return _resend;
+}
+
+function getFromAddress(): string {
+  return process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev';
+}
 
 // ── Base Utility ────────────────────────────────────────────────────
 
@@ -42,8 +51,8 @@ export async function sendEmail(options: SendEmailOptions): Promise<SendEmailRes
   const { to, subject, html, text, replyTo } = options;
 
   try {
-    const { data, error } = await resend.emails.send({
-      from: FROM_ADDRESS,
+    const { data, error } = await getResend().emails.send({
+      from: getFromAddress(),
       to: Array.isArray(to) ? to : [to],
       subject,
       html,
