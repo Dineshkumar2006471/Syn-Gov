@@ -1,6 +1,6 @@
 # SynGov Architecture & Features Overview
 
-This document serves as a comprehensive breakdown of the core features, systems, and architectural decisions recently implemented into the SynGov platform. It details the hybrid Web2/Web3 infrastructure, the complex weighted voting mechanics, the background automation systems, and UI/UX enhancements.
+This document serves as a comprehensive breakdown of the core features, systems, and architectural decisions implemented in the SynGov platform. It is designed to get the entire team up to speed on our hybrid Web2/Web3 infrastructure, weighted voting mechanics, real-time data sync, and automation systems.
 
 ---
 
@@ -15,17 +15,29 @@ At the heart of SynGov is a sophisticated, meritocratic voting system where vote
 
 ---
 
-## 2. Gamified Contribution Economy
+## 2. 100% Live, Real-Time Data Architecture
+We have completely stripped out all mock data, transitioning the entire application to a live, reactive architecture.
+
+* **Supabase Realtime Sync:** A global React hook (`useRealtimeSync.ts`) is injected into the root layout. It listens for `INSERT` and `UPDATE` events on the `proposals`, `votes`, and `users` tables via PostgreSQL logical replication.
+* **Instant Reactivity:** When a user casts a vote, creates a proposal, or updates a score, the hook triggers `router.refresh()`, updating the UI instantly across all connected clients without manual page reloads.
+* **Dynamic Dashboards:** 
+  * The `Dashboard` and `Analytics` pages parse raw data from Supabase server-side to calculate live participation rates, category distribution (scaling bar charts dynamically), and community health scores.
+  * The Activity Feed is powered directly by the `contribution_activity` ledger.
+* **Members Directory:** Automatically ranks and categorizes all users into tiers (core, high, medium, low) based on their live contribution scores, tallying their total votes on the fly.
+
+---
+
+## 3. Gamified Contribution Economy
 SynGov tracks and rewards civic participation to encourage an active community.
 
 * **Points Engine:** Users earn points for beneficial actions: Creating proposals (`+10 pts`) and casting votes (`+5 pts`).
 * **Voter Apathy Penalties:** When voting on a proposal closes, a background action automatically scans for users who did not vote and deducts points (`-3 pts`) to discourage inactivity.
-* **Immutable Activity Ledger:** Every single point change is permanently logged in the `contribution_activity` table with a human-readable reason (e.g., "Voted yes on: Allocate ₹20K for Annual Hackathon") for total transparency.
+* **Immutable Activity Ledger:** Every single point change is permanently logged in the `contribution_activity` table with a human-readable reason for total transparency.
 * **Automated Sync:** PostgreSQL database triggers automatically recalculate a user's total `governance_weight` the exact millisecond their `contribution_score` changes.
 
 ---
 
-## 3. Blockchain Integration (Polygon)
+## 4. Blockchain Integration (Polygon)
 To guarantee the integrity and immutability of governance decisions, critical events are logged on-chain.
 
 * **Ethers.js & Smart Contracts:** Integrated with a deployed Solidity smart contract via `ethers.js` connected to the Polygon network.
@@ -37,43 +49,45 @@ To guarantee the integrity and immutability of governance decisions, critical ev
 
 ---
 
-## 4. Automated Communication & Cron Jobs
-A proactive, non-blocking notification system keeps the community informed and drives participation.
+## 5. Frictionless Authentication
+We replaced standard Web3 wallet logins with an invisible, frictionless Web2 flow to maximize college student adoption.
 
-* **Resend Integration:** Implemented an email engine using the Resend API (`lib/email/resend.ts`) designed to handle mass emails asynchronously without blocking the main thread.
-* **Branded HTML Templates:** Created highly compatible, inline-styled email templates using SynGov's brand colors:
-  * **Proposal Created:** Includes the AI-generated summary and categorization.
-  * **Proposal Results:** Includes an animated visual progress bar of the final tally and a link to the blockchain transaction.
-  * **Voting Reminders:** Includes a visual participation bar and countdown.
-* **Vercel Cron Automation:** Built a secure, hourly automated route (`/api/cron/voting-reminder`). It queries the database for proposals closing within 24 hours, isolates users who haven't voted, and sends them targeted reminder emails.
+* **Auto-User Generation:** The custom authentication server action (`auth-actions.ts`) instantly verifies an email against the Supabase `users` table upon login. If the user is new, it automatically creates their account and initializes their contribution score.
+* **Secure Sessions:** The permanent database UUID is securely encrypted into an HTTP-only cookie, ensuring all future votes and actions map reliably to the user's permanent database profile.
 
 ---
 
-## 5. Robust Database Schema (Supabase/PostgreSQL)
-A complete, scalable, and secure relational database schema was designed to support the complex logic.
+## 6. Automated Communication & Cron Jobs
+A proactive, non-blocking notification system keeps the community informed and drives participation.
+
+* **Resend Integration:** Implemented an email engine using the Resend API designed to handle mass emails asynchronously.
+* **Branded HTML Templates:** Created highly compatible, inline-styled email templates:
+  * **Proposal Created:** Includes the AI-generated summary and categorization.
+  * **Proposal Results:** Includes an animated visual progress bar of the final tally.
+  * **Voting Reminders:** Includes a visual participation bar and countdown.
+* **Vercel Cron Automation:** Built a secure, hourly automated route. It queries the database for proposals closing within 24 hours, isolates users who haven't voted, and sends them targeted reminder emails.
+
+---
+
+## 7. Robust Database Schema (Supabase/PostgreSQL)
+A complete, scalable, and secure relational database schema supports the complex logic.
 
 * **4 Core Tables:**
   * `users`: Stores core identity, contribution scores, and expertise tag arrays.
   * `proposals`: Stores proposal metadata, AI summaries (as JSONB), aggregated weighted tallies, and deadline timestamps.
-  * `votes`: Stores granular data on every vote, breaking down base weight, expertise bonus, and final weight used. Enforces one vote per user per proposal.
+  * `votes`: Stores granular data on every vote, breaking down weights. Enforces one vote per user per proposal.
   * `contribution_activity`: The immutable ledger for point modifications.
-* **Advanced PostgreSQL Features:** Utilized `PL/pgSQL` to write custom functions (like `calculate_governance_weight`) and Row Level Security (RLS) policies.
+* **Row Level Security (RLS):** Database policies ensure data integrity and prevent unauthorized manipulation.
 
 ---
 
-## 6. Frontend Engineering & UI/UX
+## 8. Frontend Engineering & UI/UX
 The user interface was rigorously polished to reflect a premium, responsive Web3 application.
 
-* **VotingPanel Component:** Engineered a highly reactive dashboard widget (`components/VotingPanel.tsx`) that:
+* **VotingPanel Component:** Engineered a highly reactive dashboard widget that:
   * Displays the user's real-time weight and score.
   * Automatically highlights an "Expert Match" badge if applicable.
   * Features a live ticking countdown timer to the deadline.
   * Replaces action buttons with an animated confirmation screen outlining the exact weight applied upon voting.
-  * Displays a final outcome banner with direct PolygonScan links once voting closes.
-* **Responsive Architecture:** Converted rigid desktop layouts into fluid, mobile-first CSS grids (specifically the Analytics dashboards). Fixed navbar scaling and optimized logo margins for small screens.
-* **Avatar Dropdowns:** Replaced standard text logins with sleek, interactive circular user avatars that automatically generate initials and feature context-aware dropdown menus.
-
----
-
-## 7. AI Summarization (Google Gemini)
-* Leveraged the Google Gemini API to automatically synthesize long, complex proposal descriptions into structured, easily digestible JSON summaries containing the core objective, risk assessment, and realistic impacts. This allows voters to quickly parse information before casting weighted votes.
+* **Responsive Architecture:** Converted rigid desktop layouts into fluid, mobile-first CSS grids. Fixed navbar scaling and optimized logo margins for small screens.
+* **Micro-Interactions:** Custom `ClientInteractions.tsx` script handles smooth parallax scrolling, count-up animations for statistics, and intersection observer reveals for a highly polished feel.
