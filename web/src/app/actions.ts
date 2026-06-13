@@ -461,3 +461,25 @@ export async function postMessage(userId: string, content: string, channel: stri
     return { success: false, error: err.message }
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// PROFILE ACTIONS
+// ═══════════════════════════════════════════════════════════════
+export async function updateUserTags(userId: string, tags: string[]) {
+  try {
+    const { error } = await supabase
+      .from('users')
+      .update({ expertise_tags: tags })
+      .eq('id', userId)
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath('/profile')
+    revalidatePath('/members')
+    return { success: true }
+  } catch (err: any) {
+    return { success: false, error: err.message }
+  }
+}

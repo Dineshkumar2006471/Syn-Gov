@@ -29,6 +29,10 @@ export default function BottomNav() {
         <span className="bottom-nav-icon">👥</span>
         <span className="bottom-nav-label">Members</span>
       </Link>
+      <Link href="/profile" className={`bottom-nav-link ${pathname === '/profile' ? 'active' : ''}`}>
+        <span className="bottom-nav-icon">👤</span>
+        <span className="bottom-nav-label">Profile</span>
+      </Link>
     </nav>
   )
 }

@@ -16,6 +16,7 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
   // User Profile State
   const [userProfile, setUserProfile] = useState<any>(null)
   const [userVoteRecord, setUserVoteRecord] = useState<any>(null)
+  const [votersList, setVotersList] = useState<any[]>([])
 
   const [newComment, setNewComment] = useState('')
   const [comments, setComments] = useState([
@@ -80,6 +81,22 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
         }
       } catch (e) {
         console.log('User not logged in or fetch failed')
+      }
+
+      // 4. Fetch all votes for this proposal (for transparency list)
+      if (propData) {
+        const { data: allVotes } = await supabaseClient
+          .from('votes')
+          .select(`
+            *,
+            users:user_id (name)
+          `)
+          .eq('proposal_id', propData.id)
+          .order('created_at', { ascending: false })
+          
+        if (allVotes) {
+          setVotersList(allVotes)
+        }
       }
 
       setLoading(false)
@@ -257,6 +274,44 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
                     </div>
                   </div>
                 </div>
+              </div>
+              </div>
+
+              {/* ── VOTES CAST LIST ── */}
+              <div className="card-flat" style={{ marginTop: '24px' }}>
+                <h3 className="text-h4 mb-20">Votes Cast</h3>
+                {votersList.length === 0 ? (
+                  <p className="text-body-sm text-muted">No votes have been cast yet.</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {votersList.map(v => (
+                      <div key={v.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: 'var(--bg-secondary)', borderRadius: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--accent)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 600 }}>
+                            {v.users?.name ? v.users.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : 'U'}
+                          </div>
+                          <div>
+                            <div className="text-body-sm" style={{ fontWeight: 600 }}>{v.users?.name || 'Unknown User'}</div>
+                            <div className="text-caption text-muted">{new Date(v.created_at).toLocaleString()}</div>
+                          </div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <span className={`badge`} style={{
+                            background: v.vote_type === 'yes' ? '#DCFCE7' : v.vote_type === 'no' ? '#FEE2E2' : '#F3F4F6',
+                            color: v.vote_type === 'yes' ? '#166534' : v.vote_type === 'no' ? '#991B1B' : '#4B5563',
+                            marginRight: '8px',
+                            textTransform: 'uppercase'
+                          }}>
+                            {v.vote_type}
+                          </span>
+                          <span className="text-body-sm" style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>
+                            {parseFloat(v.final_weight).toFixed(2)}x
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 

@@ -54,6 +54,9 @@ export default function Sidebar({ user }: { user?: { name: string, email: string
         <Link href="/members" className={`sidebar-link ${pathname === '/members' ? 'active' : ''}`}>
           <span className="sidebar-icon">👥</span> Members
         </Link>
+        <Link href="/profile" className={`sidebar-link ${pathname === '/profile' ? 'active' : ''}`}>
+          <span className="sidebar-icon">👤</span> Profile
+        </Link>
       </nav>
       
       {localUser && (
