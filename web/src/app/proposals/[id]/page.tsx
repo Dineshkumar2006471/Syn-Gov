@@ -19,22 +19,7 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
   const [votersList, setVotersList] = useState<any[]>([])
 
   const [newComment, setNewComment] = useState('')
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      author: 'Priya Sharma',
-      avatar: 'PS',
-      time: '2 hours ago',
-      text: 'I think the budget breakdown looks reasonable. One question — have we explored any sponsorship options to offset costs?'
-    },
-    {
-      id: 2,
-      author: 'Rahul Kumar',
-      avatar: 'RK',
-      time: '1 hour ago',
-      text: '@Priya — great point! We\'ve reached out to 3 local tech companies for sponsorship.'
-    }
-  ])
+  const [comments, setComments] = useState<any[]>([])
 
   useEffect(() => {
     async function fetchData() {
@@ -99,23 +84,66 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
         }
       }
 
+      // 5. Fetch comments for this proposal
+      if (propData) {
+        const { data: proposalComments } = await supabaseClient
+          .from('comments')
+          .select(`
+            *,
+            users:user_id (name)
+          `)
+          .eq('proposal_id', propData.id)
+          .order('created_at', { ascending: true })
+          
+        if (proposalComments) {
+          setComments(proposalComments.map(c => ({
+            id: c.id,
+            author: c.users?.name || 'Unknown',
+            avatar: c.users?.name ? c.users.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : 'U',
+            time: new Date(c.created_at).toLocaleString(),
+            text: c.content
+          })))
+        }
+      }
+
       setLoading(false)
     }
     fetchData()
   }, [resolvedParams.id])
 
-  const handlePostComment = () => {
-    if (!newComment.trim()) return
-    const initials = userProfile ? userProfile.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : 'ME'
-    const newEntry = {
-      id: Date.now(),
-      author: userProfile?.name || 'You',
-      avatar: initials,
-      time: 'Just now',
-      text: newComment
+  const handlePostComment = async () => {
+    if (!newComment.trim() || !userProfile || !proposal) {
+      if (!userProfile) alert("Please log in to post a comment.")
+      return
     }
-    setComments([...comments, newEntry])
-    setNewComment('')
+
+    const { data: insertedComment, error } = await supabaseClient
+      .from('comments')
+      .insert({
+        proposal_id: proposal.id,
+        user_id: userProfile.id,
+        content: newComment.trim()
+      })
+      .select(`
+        *,
+        users:user_id (name)
+      `)
+      .single()
+
+    if (!error && insertedComment) {
+      const initials = userProfile.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()
+      const newEntry = {
+        id: insertedComment.id,
+        author: userProfile.name,
+        avatar: initials,
+        time: 'Just now',
+        text: insertedComment.content
+      }
+      setComments([...comments, newEntry])
+      setNewComment('')
+    } else {
+      alert("Failed to post comment.")
+    }
   }
 
   if (loading) {
