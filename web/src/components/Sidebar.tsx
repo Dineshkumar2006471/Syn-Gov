@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import { LayoutDashboard, FileText, Pencil, MessageSquare, TrendingUp, Users, User, Activity } from 'lucide-react'
 
 export default function Sidebar({ user }: { user?: { name: string, email: string } | null }) {
   const pathname = usePathname()
@@ -37,25 +38,28 @@ export default function Sidebar({ user }: { user?: { name: string, email: string
     <aside className="sidebar">
       <nav className="sidebar-nav">
         <Link href="/dashboard" className={`sidebar-link ${pathname === '/dashboard' ? 'active' : ''}`}>
-          <span className="sidebar-icon">📊</span> Dashboard
+          <LayoutDashboard className="sidebar-icon" size={18} /> Dashboard
+        </Link>
+        <Link href="/recent-activity" className={`sidebar-link ${pathname === '/recent-activity' ? 'active' : ''}`}>
+          <Activity className="sidebar-icon" size={18} /> Recent Activity
         </Link>
         <Link href="/proposals" className={`sidebar-link ${pathname === '/proposals' ? 'active' : ''}`}>
-          <span className="sidebar-icon">📋</span> Proposals
+          <FileText className="sidebar-icon" size={18} /> Proposals
         </Link>
         <Link href="/create-proposal" className={`sidebar-link ${pathname === '/create-proposal' ? 'active' : ''}`}>
-          <span className="sidebar-icon">✏️</span> New Proposal
+          <Pencil className="sidebar-icon" size={18} /> New Proposal
         </Link>
         <Link href="/discussions" className={`sidebar-link ${pathname === '/discussions' ? 'active' : ''}`}>
-          <span className="sidebar-icon">💬</span> Discussions
+          <MessageSquare className="sidebar-icon" size={18} /> Discussions
         </Link>
         <Link href="/analytics" className={`sidebar-link ${pathname === '/analytics' ? 'active' : ''}`}>
-          <span className="sidebar-icon">📈</span> Analytics
+          <TrendingUp className="sidebar-icon" size={18} /> Analytics
         </Link>
         <Link href="/members" className={`sidebar-link ${pathname === '/members' ? 'active' : ''}`}>
-          <span className="sidebar-icon">👥</span> Members
+          <Users className="sidebar-icon" size={18} /> Members
         </Link>
         <Link href="/profile" className={`sidebar-link ${pathname === '/profile' ? 'active' : ''}`}>
-          <span className="sidebar-icon">👤</span> Profile
+          <User className="sidebar-icon" size={18} /> Profile
         </Link>
       </nav>
       

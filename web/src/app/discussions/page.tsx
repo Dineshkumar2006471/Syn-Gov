@@ -64,7 +64,10 @@ export default function Discussions() {
           users: userData || { name: 'Unknown' }
         }
         
-        setMessages(prev => [...prev, newMessageWithUser])
+        setMessages(prev => {
+          if (prev.some(m => m.id === newMessageWithUser.id)) return prev;
+          return [...prev, newMessageWithUser];
+        })
       })
       .subscribe()
 
@@ -80,7 +83,17 @@ export default function Discussions() {
     const contentToSend = newMessage
     setNewMessage('') // Optimistic clear
 
-    await postMessage(dbUser.id, contentToSend, activeChannel)
+    const result = await postMessage(dbUser.id, contentToSend, activeChannel)
+    if (result.success && result.message) {
+      const msgWithUser = {
+        ...result.message,
+        users: { name: dbUser.name }
+      }
+      setMessages(prev => {
+        if (prev.some(m => m.id === msgWithUser.id)) return prev;
+        return [...prev, msgWithUser];
+      })
+    }
   }
 
   const formatTime = (isoString: string) => {

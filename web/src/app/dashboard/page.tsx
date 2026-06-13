@@ -4,6 +4,7 @@ import BottomNav from "@/components/BottomNav";
 import { supabase } from '@/lib/supabase'
 import { getUser } from '@/app/auth-actions'
 import Link from 'next/link'
+import { Banknote, Calendar } from 'lucide-react'
 
 export const revalidate = 0;
 
@@ -136,8 +137,12 @@ export default async function Dashboard() {
                         </div>
                       </div>
                       <div className="proposal-card-meta">
-                        <span>💰 {p.budget || 'None'}</span>
-                        <span>📅 Active</span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <Banknote size={14} /> {p.budget || 'None'}
+                        </span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <Calendar size={14} /> Active
+                        </span>
                       </div>
                     </Link>
                   )

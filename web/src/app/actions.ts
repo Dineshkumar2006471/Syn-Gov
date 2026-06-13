@@ -151,24 +151,30 @@ export async function createProposal(data: any) {
       )
     }
 
-    // 4. Notify all members via email
-    const aiWhat = data.aiSummary?.what || data.description?.substring(0, 120) || data.title
-    notifyAllMembers(
-      `📋 New Proposal: ${data.title}`,
-      () => proposalCreatedTemplate({
-        authorName: data.authorName || 'A community member',
-        proposalTitle: data.title,
-        aiSummary: aiWhat,
-        category: data.category || 'general',
-        proposalUrl: `${APP_URL}/proposals`,
-      })
-    )
+    // 4. Notify the creator via email
+    if (data.authorId) {
+      const { data: author } = await supabase.from('users').select('email, name').eq('id', data.authorId).single()
+      if (author && author.email) {
+        await sendEmail({
+          to: author.email,
+          subject: `📋 Proposal Created: ${data.title}`,
+          html: proposalCreatedTemplate({
+            authorName: author.name || 'A community member',
+            proposalTitle: data.title,
+            aiSummary: data.aiSummary?.what || data.description?.substring(0, 120) || data.title,
+            budget: data.budget,
+            proposalUrl: `${APP_URL}/proposals/${result[0].id}`,
+          })
+        })
+      }
+    }
 
     revalidatePath('/dashboard')
     revalidatePath('/proposals')
+
     return { success: true, id: result[0].id }
   } catch (err: any) {
-    throw new Error(err.message)
+    return { success: false, error: err.message }
   }
 }
 
@@ -218,16 +224,16 @@ export async function castVoteAction(
       return { success: false, finalWeight: 0, expertiseBonus: 0, weightedYes: 0, weightedNo: 0, error: 'Voting is closed on this proposal' }
     }
 
-    // ── 4. Block duplicate votes ───────────────────────────
+    // ── 4. Check for existing vote ───────────────────────────
     const { data: existingVote } = await supabase
       .from('votes')
-      .select('id')
+      .select('id, vote_type, final_weight')
       .eq('proposal_id', proposalId)
       .eq('user_id', userId)
       .single()
 
-    if (existingVote) {
-      return { success: false, finalWeight: 0, expertiseBonus: 0, weightedYes: 0, weightedNo: 0, error: 'You have already voted on this proposal' }
+    if (existingVote && existingVote.vote_type === voteType) {
+      return { success: false, finalWeight: 0, expertiseBonus: 0, weightedYes: 0, weightedNo: 0, error: 'You have already voted this way.' }
     }
 
     // ── 5. Calculate weights ───────────────────────────────
@@ -238,24 +244,47 @@ export async function castVoteAction(
     const finalWeight = calculateFinalWeight(user.contribution_score, expertiseBonus)
     const baseWeight = user.contribution_score / 100
 
-    // ── 6. Insert vote ─────────────────────────────────────
-    const { error: voteError } = await supabase.from('votes').insert([{
-      proposal_id: proposalId,
-      user_id: userId,
-      vote_type: voteType,
-      base_weight: Math.min(Math.max(baseWeight, 0.5), 2.0),
-      expertise_bonus: expertiseBonus,
-      final_weight: finalWeight,
-    }])
+    // ── 6. Insert or Update vote ───────────────────────────
+    if (existingVote) {
+      const { error: updateError } = await supabase
+        .from('votes')
+        .update({
+          vote_type: voteType,
+          base_weight: Math.min(Math.max(baseWeight, 0.5), 2.0),
+          expertise_bonus: expertiseBonus,
+          final_weight: finalWeight,
+        })
+        .eq('id', existingVote.id)
 
-    if (voteError) {
-      return { success: false, finalWeight: 0, expertiseBonus: 0, weightedYes: 0, weightedNo: 0, error: voteError.message }
+      if (updateError) {
+        return { success: false, finalWeight: 0, expertiseBonus: 0, weightedYes: 0, weightedNo: 0, error: updateError.message }
+      }
+    } else {
+      const { error: voteError } = await supabase.from('votes').insert([{
+        proposal_id: proposalId,
+        user_id: userId,
+        vote_type: voteType,
+        base_weight: Math.min(Math.max(baseWeight, 0.5), 2.0),
+        expertise_bonus: expertiseBonus,
+        final_weight: finalWeight,
+      }])
+
+      if (voteError) {
+        return { success: false, finalWeight: 0, expertiseBonus: 0, weightedYes: 0, weightedNo: 0, error: voteError.message }
+      }
     }
 
     // ── 7. Update weighted totals on proposal ──────────────
     let newWeightedYes = parseFloat(proposal.weighted_yes) || 0
     let newWeightedNo = parseFloat(proposal.weighted_no) || 0
 
+    // Reverse old vote impact
+    if (existingVote) {
+      if (existingVote.vote_type === 'yes') newWeightedYes -= existingVote.final_weight
+      if (existingVote.vote_type === 'no') newWeightedNo -= existingVote.final_weight
+    }
+
+    // Apply new vote impact
     if (voteType === 'yes') {
       newWeightedYes += finalWeight
     } else if (voteType === 'no') {
@@ -276,14 +305,24 @@ export async function castVoteAction(
       console.log('Web3 logging failed:', e.message)
     }
 
-    // ── 9. Award contribution points ───────────────────────
-    await updateContributionScore(
-      userId,
-      'vote_cast',
-      `Voted ${voteType} on: ${proposal.title}`,
-      5,
-      proposalId
-    )
+    // ── 9. Award contribution points (only if new vote) ────
+    if (!existingVote) {
+      await updateContributionScore(
+        userId,
+        'vote_cast',
+        `Voted ${voteType} on: ${proposal.title}`,
+        5,
+        proposalId
+      )
+    } else {
+      await updateContributionScore(
+        userId,
+        'vote_edited',
+        `Changed vote to ${voteType} on: ${proposal.title}`,
+        0, // No extra points for editing
+        proposalId
+      )
+    }
 
     revalidatePath('/dashboard')
     revalidatePath('/proposals')

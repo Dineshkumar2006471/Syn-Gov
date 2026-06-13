@@ -1,6 +1,7 @@
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
+import { Sparkles, FileText, Scale, Link2, X, Check } from 'lucide-react'
 
 export default function Home() {
   return (
@@ -47,7 +48,7 @@ export default function Home() {
 
               <div className="hero-float-card hero-float-card-2 float-anim" style={{animationDelay:'1s'}}>
                 <div style={{display:'flex', alignItems:'center', gap:'6px', marginBottom:'8px'}}>
-                  <span style={{fontSize:'1rem'}}>✨</span>
+                  <Sparkles size={16} style={{ color: 'var(--accent)' }} />
                   <span className="text-caption" style={{fontWeight:600, color:'var(--accent)'}}>AI Summary</span>
                 </div>
                 <div className="text-body-sm" style={{color:'var(--text-secondary)', lineHeight:1.5}}>
@@ -114,13 +115,13 @@ export default function Home() {
             <div className="reveal-left">
               <div className="problem-image">
                 <img src="/images/chaotic-meeting.png" alt="Chaotic, disorganized club meeting" />
-                <span className="problem-image-label before">✗ Before SynGov</span>
+                <span className="problem-image-label before"><X size={14} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }} /> Before SynGov</span>
               </div>
             </div>
             <div className="reveal-right">
               <div className="problem-image">
                 <img src="/images/organized-meeting.png" alt="Well-organized meeting with SynGov" />
-                <span className="problem-image-label after">✓ With SynGov</span>
+                <span className="problem-image-label after"><Check size={14} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }} /> With SynGov</span>
               </div>
             </div>
           </div>
@@ -128,51 +129,51 @@ export default function Home() {
           <div className="stagger-children" style={{maxWidth:'900px', margin:'0 auto'}}>
             <div className="comparison-row">
               <div className="comparison-before">
-                <span className="comparison-icon">✗</span>
+                <span className="comparison-icon"><X size={16} /></span>
                 Decisions made by 2–3 people
               </div>
               <div className="comparison-after">
-                <span className="comparison-icon">✓</span>
+                <span className="comparison-icon"><Check size={16} /></span>
                 Every member gets a weighted voice
               </div>
             </div>
             <div className="comparison-row">
               <div className="comparison-before">
-                <span className="comparison-icon">✗</span>
+                <span className="comparison-icon"><X size={16} /></span>
                 Proposals are hard to understand
               </div>
               <div className="comparison-after">
-                <span className="comparison-icon">✓</span>
+                <span className="comparison-icon"><Check size={16} /></span>
                 AI-simplified KPI summaries
               </div>
             </div>
             <div className="comparison-row">
               <div className="comparison-before">
-                <span className="comparison-icon">✗</span>
+                <span className="comparison-icon"><X size={16} /></span>
                 Fund usage is opaque
               </div>
               <div className="comparison-after">
-                <span className="comparison-icon">✓</span>
+                <span className="comparison-icon"><Check size={16} /></span>
                 Every vote logged on blockchain
               </div>
             </div>
             <div className="comparison-row">
               <div className="comparison-before">
-                <span className="comparison-icon">✗</span>
+                <span className="comparison-icon"><X size={16} /></span>
                 Active members treated like lurkers
               </div>
               <div className="comparison-after">
-                <span className="comparison-icon">✓</span>
+                <span className="comparison-icon"><Check size={16} /></span>
                 Contribution score = real influence
               </div>
             </div>
             <div className="comparison-row">
               <div className="comparison-before">
-                <span className="comparison-icon">✗</span>
+                <span className="comparison-icon"><X size={16} /></span>
                 No record of past decisions
               </div>
               <div className="comparison-after">
-                <span className="comparison-icon">✓</span>
+                <span className="comparison-icon"><Check size={16} /></span>
                 Full governance history, always visible
               </div>
             </div>
@@ -193,28 +194,28 @@ export default function Home() {
 
             <div className="step-card">
               <div className="step-number">1</div>
-              <div className="step-icon">📝</div>
+              <div className="step-icon"><FileText size={24} /></div>
               <h4 className="text-h4">Create a Proposal</h4>
               <p className="text-body-sm">Write your proposal in plain text. SynGov does the rest.</p>
             </div>
 
             <div className="step-card">
               <div className="step-number">2</div>
-              <div className="step-icon">✨</div>
+              <div className="step-icon"><Sparkles size={24} /></div>
               <h4 className="text-h4">AI Simplifies It</h4>
               <p className="text-body-sm">Gemini extracts what matters — cost, risk, impact, deadline.</p>
             </div>
 
             <div className="step-card">
               <div className="step-number">3</div>
-              <div className="step-icon">⚖️</div>
+              <div className="step-icon"><Scale size={24} /></div>
               <h4 className="text-h4">Members Vote</h4>
               <p className="text-body-sm">Each vote is weighted by contribution and expertise — not rank.</p>
             </div>
 
             <div className="step-card">
               <div className="step-number">4</div>
-              <div className="step-icon">🔗</div>
+              <div className="step-icon"><Link2 size={24} /></div>
               <h4 className="text-h4">Decision is Logged</h4>
               <p className="text-body-sm">The result is transparent and permanently recorded on Polygon.</p>
             </div>
@@ -246,7 +247,7 @@ export default function Home() {
           <div className="features-grid stagger-children">
 
             <div className="feature-card">
-              <div className="feature-icon">⚖️</div>
+              <div className="feature-icon"><Scale size={24} /></div>
               <h4 className="text-h4">Contribution-Aware Voting</h4>
               <p className="text-body-sm">
                 Your influence reflects your involvement. Attendance, tasks, proposals — all of it counts toward your governance weight. Newcomers start at 1.0×. Core members earn up to 1.5×.
@@ -254,7 +255,7 @@ export default function Home() {
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">✨</div>
+              <div className="feature-icon"><Sparkles size={24} /></div>
               <h4 className="text-h4">AI-Simplified Proposals</h4>
               <p className="text-body-sm">
                 Long proposals get turned into clear summaries instantly. What's being asked. Why it matters. What it costs. What the risk is. No reading fatigue.
@@ -262,7 +263,7 @@ export default function Home() {
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">🔗</div>
+              <div className="feature-icon"><Link2 size={24} /></div>
               <h4 className="text-h4">Transparent by Default</h4>
               <p className="text-body-sm">
                 Every vote, every decision, every proposal outcome is logged on Polygon. Anyone can verify. Nothing is hidden. Trust is built into the system.

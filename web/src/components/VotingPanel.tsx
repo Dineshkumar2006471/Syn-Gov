@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { castVoteAction } from '@/app/actions'
+import { ThumbsUp, ThumbsDown, Clock, CheckCircle, Ban, AlertTriangle, Edit2 } from 'lucide-react'
 
 // ── Interfaces ──────────────────────────────────────────────────────
 
@@ -156,7 +157,7 @@ export default function VotingPanel(props: VotingPanelProps) {
 
       {/* ── Countdown ───────────────────────────────── */}
       <div className="voting-countdown">
-        <span className="voting-countdown-icon"></span>
+        <span className="voting-countdown-icon"><Clock size={16} /></span>
         <span className={`voting-countdown-text ${isExpired ? 'expired' : ''}`}>
           {timeLeft}
         </span>
@@ -188,47 +189,58 @@ export default function VotingPanel(props: VotingPanelProps) {
       {!hasVoted && !isClosed && (
         <div className="voting-buttons">
           <button
-            className="voting-btn voting-btn-yes"
+            className={`voting-btn voting-btn-yes ${votedType === 'yes' ? 'active' : ''}`}
             onClick={() => handleVote('yes')}
             disabled={loading !== null}
           >
             {loading === 'yes' ? (
               <span className="voting-spinner" />
-            ) : 'Yes'}
+            ) : <><ThumbsUp size={16} style={{marginRight: '6px'}} /> Yes</>}
           </button>
           <button
-            className="voting-btn voting-btn-no"
+            className={`voting-btn voting-btn-no ${votedType === 'no' ? 'active' : ''}`}
             onClick={() => handleVote('no')}
             disabled={loading !== null}
           >
             {loading === 'no' ? (
               <span className="voting-spinner" />
-            ) : 'No'}
+            ) : <><ThumbsDown size={16} style={{marginRight: '6px'}} /> No</>}
           </button>
           <button
-            className="voting-btn voting-btn-abstain"
+            className={`voting-btn voting-btn-abstain ${votedType === 'abstain' ? 'active' : ''}`}
             onClick={() => handleVote('abstain')}
             disabled={loading !== null}
           >
             {loading === 'abstain' ? (
               <span className="voting-spinner" />
-            ) : 'Abstain'}
+            ) : <><Ban size={16} style={{marginRight: '6px'}} /> Abstain</>}
           </button>
         </div>
       )}
 
       {hasVoted && (
-        <div className="voting-confirmation">
-          <div className="voting-confirmation-icon"></div>
-          <p className="voting-confirmation-text">
-            You voted <strong className={`vote-${votedType}`}>
-              {votedType.toUpperCase()}
-            </strong> with weight <strong>{votedWeight.toFixed(2)}x</strong>
-          </p>
-          {expertiseMatch && (
-            <p className="voting-confirmation-bonus">
-              +0.2 expertise bonus applied
+        <div className="voting-confirmation" style={{ position: 'relative' }}>
+          <div className="voting-confirmation-icon"><CheckCircle size={20} color="var(--success)" /></div>
+          <div style={{ flex: 1 }}>
+            <p className="voting-confirmation-text">
+              You voted <strong className={`vote-${votedType}`}>
+                {votedType.toUpperCase()}
+              </strong> with weight <strong>{votedWeight.toFixed(2)}x</strong>
             </p>
+            {expertiseMatch && (
+              <p className="voting-confirmation-bonus">
+                +0.2 expertise bonus applied
+              </p>
+            )}
+          </div>
+          {!isClosed && (
+            <button 
+              className="btn btn-ghost btn-sm" 
+              style={{ position: 'absolute', right: '12px', top: '12px' }}
+              onClick={() => setHasVoted(false)}
+            >
+              <Edit2 size={14} style={{ marginRight: '4px' }} /> Edit
+            </button>
           )}
         </div>
       )}
@@ -241,7 +253,7 @@ export default function VotingPanel(props: VotingPanelProps) {
 
       {error && (
         <div className="voting-error">
-          <p>{error}</p>
+          <p><AlertTriangle size={16} style={{display: 'inline-block', verticalAlign: 'middle', marginRight: '4px'}} /> {error}</p>
         </div>
       )}
 
