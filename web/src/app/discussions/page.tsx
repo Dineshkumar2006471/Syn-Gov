@@ -13,6 +13,7 @@ export default function Discussions() {
   const [newMessage, setNewMessage] = useState('')
   const [user, setUser] = useState<any>(null)
   const [dbUser, setDbUser] = useState<any>(null)
+  const [activeChannel, setActiveChannel] = useState('general')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -28,9 +29,9 @@ export default function Discussions() {
       
       if (authUser) {
         setUser(authUser)
-        // fetch the profile mapping
-        const { data: profile } = await supabase.from('users').select('*').eq('id', authUser.id).single()
-        setDbUser(profile)
+        // fetch the profile mapping using authenticated client
+        const { data: profile } = await supabaseAuth.from('users').select('*').eq('id', authUser.id).single()
+        setDbUser(profile || { id: authUser.id, name: authUser.user_metadata?.full_name || authUser.email })
       }
 
       // 2. Fetch history
@@ -49,11 +50,11 @@ export default function Discussions() {
   // Auto-scroll
   useEffect(() => {
     scrollToBottom()
-  }, [messages])
+  }, [messages, activeChannel])
 
   // Realtime subscription
   useEffect(() => {
-    const channel = supabase.channel('public:discussions')
+    const channelSub = supabase.channel('public:discussions')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'discussions' }, async (payload) => {
         // Fetch the user name for the new message
         const { data: userData } = await supabase.from('users').select('name').eq('id', payload.new.user_id).single()
@@ -68,7 +69,7 @@ export default function Discussions() {
       .subscribe()
 
     return () => {
-      supabase.removeChannel(channel)
+      supabase.removeChannel(channelSub)
     }
   }, [])
 
@@ -79,13 +80,15 @@ export default function Discussions() {
     const contentToSend = newMessage
     setNewMessage('') // Optimistic clear
 
-    await postMessage(dbUser.id, contentToSend, 'general')
+    await postMessage(dbUser.id, contentToSend, activeChannel)
   }
 
   const formatTime = (isoString: string) => {
     const date = new Date(isoString)
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
+
+  const filteredMessages = messages.filter(m => m.channel === activeChannel)
 
   return (
     <>
@@ -102,14 +105,33 @@ export default function Discussions() {
 
           <div className="card-flat" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0, background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border)' }}>
             
+            {/* Channels Header */}
+            <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', background: 'var(--bg-card)' }}>
+              {['general', 'proposals', 'ideas'].map(ch => (
+                <button
+                  key={ch}
+                  onClick={() => setActiveChannel(ch)}
+                  style={{
+                    flex: 1, padding: '16px', background: 'none', border: 'none', cursor: 'pointer',
+                    fontWeight: activeChannel === ch ? 700 : 500,
+                    color: activeChannel === ch ? 'var(--accent)' : 'var(--text-muted)',
+                    borderBottom: activeChannel === ch ? '2px solid var(--accent)' : '2px solid transparent',
+                    textTransform: 'capitalize'
+                  }}
+                >
+                  # {ch}
+                </button>
+              ))}
+            </div>
+
             {/* Messages Area */}
             <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {messages.length === 0 ? (
+              {filteredMessages.length === 0 ? (
                 <div style={{ textAlign: 'center', color: 'var(--text-muted)', marginTop: 'auto', marginBottom: 'auto' }}>
-                  No messages yet. Be the first to start the discussion!
+                  No messages in #{activeChannel} yet. Be the first to start the discussion!
                 </div>
               ) : (
-                messages.map((msg, i) => {
+                filteredMessages.map((msg, i) => {
                   const isMe = dbUser && msg.user_id === dbUser.id
                   const authorName = (msg.users as any)?.name || 'Unknown User'
                   const initials = authorName.substring(0, 2).toUpperCase()
@@ -163,7 +185,7 @@ export default function Discussions() {
                     type="text" 
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Type your message..." 
+                    placeholder={`Message #${activeChannel}...`}
                     className="input"
                     style={{ flex: 1, padding: '12px 16px', borderRadius: '100px' }}
                   />
