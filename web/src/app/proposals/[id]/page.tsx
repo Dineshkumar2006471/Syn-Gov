@@ -275,7 +275,6 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
                   </div>
                 </div>
               </div>
-              </div>
 
               {/* ── VOTES CAST LIST ── */}
               <div className="card-flat" style={{ marginTop: '24px' }}>
