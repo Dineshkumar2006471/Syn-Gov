@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { login } from '@/app/auth-actions'
+import { login, signup } from '@/app/auth-actions'
 
 export default function Login() {
   const router = useRouter()
@@ -22,23 +22,24 @@ export default function Login() {
     await new Promise(resolve => setTimeout(resolve, 800))
     
     // Call server action to set session
-    // If logging in, name isn't needed by our auth-actions (it finds by email)
-    // If signing up, we pass the provided name.
-    const res = await login(isSignUp ? name : "Existing User", email)
+    let res;
+    if (isSignUp) {
+      res = await signup(name, email, password)
+    } else {
+      res = await login(email, password)
+    }
     
     if (res.success) {
       router.push('/dashboard')
     } else {
       setIsLoggingIn(false)
-      alert("Authentication failed. Please try again.")
+      alert(res.error || "Authentication failed. Please try again.")
     }
   }
 
   const handleGoogleLogin = async () => {
-    setIsLoggingIn(true)
-    await new Promise(resolve => setTimeout(resolve, 800))
-    await login("Arjun Mehta", "arjun@syngov.edu")
-    router.push('/dashboard')
+    // Left empty or we can add Supabase OAuth here later
+    alert("OAuth not yet configured")
   }
 
   return (

@@ -3,7 +3,8 @@ import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
 import BottomNav from "@/components/BottomNav";
 import { useState, useEffect, use } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase as supabaseClient } from '@/lib/supabase'
+import { createClient } from '@/utils/supabase/client'
 import Link from 'next/link'
 import VotingPanel from '@/components/VotingPanel'
 
@@ -37,7 +38,7 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
   useEffect(() => {
     async function fetchData() {
       // 1. Fetch Proposal
-      const { data: propData } = await supabase
+      const { data: propData } = await supabaseClient
         .from('proposals')
         .select('*')
         .eq('id', resolvedParams.id)
@@ -47,33 +48,32 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
         setProposal(propData)
       }
 
-      // 2. Fetch logged-in user from our cookie-based auth
+      // 2. Fetch logged-in user from Supabase Auth
       try {
-        const res = await fetch('/api/me')
-        if (res.ok) {
-          const cookieUser = await res.json()
-          if (cookieUser?.email) {
-            const { data: profile } = await supabase
-              .from('users')
-              .select('*')
-              .eq('email', cookieUser.email)
-              .single()
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          // Fetch full user profile from our public.users table
+          const { data: profile } = await supabaseClient
+            .from('users')
+            .select('*')
+            .eq('id', user.id)
+            .single()
+          
+          if (profile) {
+            setUserProfile(profile)
             
-            if (profile) {
-              setUserProfile(profile)
+            // 3. Check if user already voted
+            if (propData) {
+              const { data: vote } = await supabaseClient
+                .from('votes')
+                .select('*')
+                .eq('proposal_id', propData.id)
+                .eq('user_id', profile.id)
+                .single()
               
-              // 3. Check if user already voted
-              if (propData) {
-                const { data: vote } = await supabase
-                  .from('votes')
-                  .select('*')
-                  .eq('proposal_id', propData.id)
-                  .eq('user_id', profile.id)
-                  .single()
-                
-                if (vote) {
-                  setUserVoteRecord(vote)
-                }
+              if (vote) {
+                setUserVoteRecord(vote)
               }
             }
           }

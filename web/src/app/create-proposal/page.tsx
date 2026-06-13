@@ -5,6 +5,7 @@ import BottomNav from "@/components/BottomNav";
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { generateProposalSummary, createProposal } from '@/app/actions'
+import { createClient } from '@/utils/supabase/client'
 
 export default function CreateProposal() {
   const router = useRouter()
@@ -19,18 +20,14 @@ export default function CreateProposal() {
   const [userId, setUserId] = useState<string | null>(null)
   const [userName, setUserName] = useState<string | null>(null)
 
-  // Fetch the logged-in user from our cookie-based session
+  // Fetch the logged-in user from Supabase
   useEffect(() => {
     async function fetchUser() {
-      try {
-        const res = await fetch('/api/me')
-        if (res.ok) {
-          const data = await res.json()
-          setUserId(data.id || null)
-          setUserName(data.name || null)
-        }
-      } catch (e) {
-        console.log('Not logged in')
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setUserId(user.id)
+        setUserName(user.user_metadata?.full_name || user.email)
       }
     }
     fetchUser()
