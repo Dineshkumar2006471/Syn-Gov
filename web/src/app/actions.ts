@@ -433,3 +433,31 @@ export async function closeVotingAction(proposalId: string): Promise<CloseVoting
     return { success: false, error: err.message }
   }
 }
+
+export async function postMessage(userId: string, content: string, channel: string = 'general') {
+  try {
+    const { data, error } = await supabase
+      .from('discussions')
+      .insert([
+        {
+          user_id: userId,
+          content,
+          channel,
+        }
+      ])
+      .select()
+
+    if (error) {
+      console.error('Error posting message:', error.message)
+      return { success: false, error: error.message }
+    }
+
+    // Optionally award 1 point for participating in discussion occasionally
+    // We'll skip it for every message to prevent spam, or we could just do it here:
+    // await updateContributionScore(userId, 'discussion_participation', `Participated in #${channel}`, 1)
+
+    return { success: true, message: data?.[0] }
+  } catch (err: any) {
+    return { success: false, error: err.message }
+  }
+}

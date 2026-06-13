@@ -45,6 +45,9 @@ export default function Sidebar({ user }: { user?: { name: string, email: string
         <Link href="/create-proposal" className={`sidebar-link ${pathname === '/create-proposal' ? 'active' : ''}`}>
           <span className="sidebar-icon">✏️</span> New Proposal
         </Link>
+        <Link href="/discussions" className={`sidebar-link ${pathname === '/discussions' ? 'active' : ''}`}>
+          <span className="sidebar-icon">💬</span> Discussions
+        </Link>
         <Link href="/analytics" className={`sidebar-link ${pathname === '/analytics' ? 'active' : ''}`}>
           <span className="sidebar-icon">📈</span> Analytics
         </Link>

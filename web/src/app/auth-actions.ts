@@ -30,7 +30,7 @@ export async function signup(name: string, email: string, password?: string) {
     return { success: false, error: 'Password is required' }
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -43,6 +43,11 @@ export async function signup(name: string, email: string, password?: string) {
   if (error) {
     console.error("Signup Error:", error.message)
     return { success: false, error: error.message }
+  }
+
+  // If identities is empty, the user already exists with this email!
+  if (data?.user?.identities?.length === 0) {
+    return { success: false, error: 'An account with this email already exists. Please sign in.' }
   }
 
   return { success: true }
