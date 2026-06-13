@@ -150,13 +150,13 @@ export default function VotingPanel(props: VotingPanelProps) {
           <span className="voting-stat-value">{userContributionScore} pts</span>
         </div>
         {expertiseMatch && (
-          <span className="voting-expertise-badge">✨ Expert Match</span>
+          <span className="voting-expertise-badge">Expert Match</span>
         )}
       </div>
 
       {/* ── Countdown ───────────────────────────────── */}
       <div className="voting-countdown">
-        <span className="voting-countdown-icon">⏰</span>
+        <span className="voting-countdown-icon"></span>
         <span className={`voting-countdown-text ${isExpired ? 'expired' : ''}`}>
           {timeLeft}
         </span>
@@ -165,8 +165,8 @@ export default function VotingPanel(props: VotingPanelProps) {
       {/* ── Progress Bars ───────────────────────────── */}
       <div className="voting-progress-section">
         <div className="voting-progress-labels">
-          <span className="voting-yes-label">👍 Yes ({yesPercent}%)</span>
-          <span className="voting-no-label">👎 No ({noPercent}%)</span>
+          <span className="voting-yes-label">Yes ({yesPercent}%)</span>
+          <span className="voting-no-label">No ({noPercent}%)</span>
         </div>
         <div className="voting-progress-bar">
           <div
@@ -194,7 +194,7 @@ export default function VotingPanel(props: VotingPanelProps) {
           >
             {loading === 'yes' ? (
               <span className="voting-spinner" />
-            ) : '👍 Yes'}
+            ) : 'Yes'}
           </button>
           <button
             className="voting-btn voting-btn-no"
@@ -203,7 +203,7 @@ export default function VotingPanel(props: VotingPanelProps) {
           >
             {loading === 'no' ? (
               <span className="voting-spinner" />
-            ) : '👎 No'}
+            ) : 'No'}
           </button>
           <button
             className="voting-btn voting-btn-abstain"
@@ -212,14 +212,14 @@ export default function VotingPanel(props: VotingPanelProps) {
           >
             {loading === 'abstain' ? (
               <span className="voting-spinner" />
-            ) : '⏭️ Abstain'}
+            ) : 'Abstain'}
           </button>
         </div>
       )}
 
       {hasVoted && (
         <div className="voting-confirmation">
-          <div className="voting-confirmation-icon">✅</div>
+          <div className="voting-confirmation-icon"></div>
           <p className="voting-confirmation-text">
             You voted <strong className={`vote-${votedType}`}>
               {votedType.toUpperCase()}
@@ -235,13 +235,13 @@ export default function VotingPanel(props: VotingPanelProps) {
 
       {!hasVoted && isClosed && (
         <div className="voting-closed-msg">
-          <p>🔒 Voting is closed. You did not participate.</p>
+          <p>Voting is closed. You did not participate.</p>
         </div>
       )}
 
       {error && (
         <div className="voting-error">
-          <p>⚠️ {error}</p>
+          <p>{error}</p>
         </div>
       )}
 
@@ -249,7 +249,7 @@ export default function VotingPanel(props: VotingPanelProps) {
       {proposalStatus !== 'active' && (
         <div className={`voting-result-banner ${proposalStatus === 'passed' ? 'passed' : 'rejected'}`}>
           <div className="voting-result-icon">
-            {proposalStatus === 'passed' ? '✅' : '❌'}
+            {proposalStatus === 'passed' ? 'Passed' : 'Rejected'}
           </div>
           <div className="voting-result-text">
             <strong>
@@ -264,7 +264,7 @@ export default function VotingPanel(props: VotingPanelProps) {
               rel="noopener noreferrer"
               className="voting-tx-link"
             >
-              🔗 View on Polygon
+              View on Polygon
             </a>
           )}
         </div>

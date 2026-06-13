@@ -74,8 +74,8 @@ export default async function Proposals() {
                       </div>
                     </div>
                     <div className="proposal-card-meta">
-                      <span>💰 {p.budget || 'None'}</span>
-                      <span>📅 {p.status === 'active' ? 'Active' : 'Closed'}</span>
+                      <span>Cost: {p.budget || 'None'}</span>
+                      <span>Status: {p.status === 'active' ? 'Active' : 'Closed'}</span>
                     </div>
                   </a>
                 )

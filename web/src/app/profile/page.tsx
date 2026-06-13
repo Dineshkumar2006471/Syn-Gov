@@ -16,6 +16,8 @@ export default function Profile() {
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [customTagInput, setCustomTagInput] = useState('')
+  const [showCustomInput, setShowCustomInput] = useState(false)
 
   useEffect(() => {
     async function fetchUser() {
@@ -39,12 +41,28 @@ export default function Profile() {
   }, [])
 
   const toggleTag = (tag: string) => {
+    if (tag === 'custom') {
+      setShowCustomInput(!showCustomInput)
+      return
+    }
     if (selectedTags.includes(tag)) {
       setSelectedTags(selectedTags.filter(t => t !== tag))
     } else {
       setSelectedTags([...selectedTags, tag])
     }
   }
+
+  const handleAddCustomTag = () => {
+    if (customTagInput.trim() && !selectedTags.includes(customTagInput.trim().toLowerCase())) {
+      setSelectedTags([...selectedTags, customTagInput.trim().toLowerCase()])
+    }
+    setCustomTagInput('')
+    setShowCustomInput(false)
+  }
+
+  // Combine default tags, the "custom" button, and any custom tags the user already has
+  const customUserTags = selectedTags.filter(t => !AVAILABLE_TAGS.includes(t))
+  const displayTags = [...AVAILABLE_TAGS, ...customUserTags, 'custom']
 
   const handleSave = async () => {
     if (!userProfile) return
@@ -152,8 +170,10 @@ export default function Profile() {
               </p>
 
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '24px' }}>
-                {AVAILABLE_TAGS.map(tag => {
-                  const isSelected = selectedTags.includes(tag)
+                {displayTags.map(tag => {
+                  const isCustomBtn = tag === 'custom'
+                  const isSelected = !isCustomBtn && selectedTags.includes(tag)
+                  
                   return (
                     <button 
                       key={tag}
@@ -161,20 +181,35 @@ export default function Profile() {
                       style={{
                         padding: '8px 16px',
                         borderRadius: '20px',
-                        border: `1px solid ${isSelected ? 'var(--accent)' : 'var(--border)'}`,
-                        background: isSelected ? 'var(--accent-light)' : 'transparent',
-                        color: isSelected ? 'var(--accent)' : 'var(--text-secondary)',
+                        border: `1px solid ${isSelected || (isCustomBtn && showCustomInput) ? 'var(--accent)' : 'var(--border)'}`,
+                        background: isSelected || (isCustomBtn && showCustomInput) ? 'var(--accent-light)' : 'transparent',
+                        color: isSelected || (isCustomBtn && showCustomInput) ? 'var(--accent)' : 'var(--text-secondary)',
                         fontWeight: isSelected ? 600 : 400,
                         cursor: 'pointer',
                         transition: 'all 0.2s',
                         textTransform: 'capitalize'
                       }}
                     >
-                      {isSelected ? '✓ ' : ''}{tag}
+                      {isSelected ? '✓ ' : ''}{isCustomBtn ? '+ Custom' : tag}
                     </button>
                   )
                 })}
               </div>
+
+              {showCustomInput && (
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+                  <input 
+                    type="text" 
+                    value={customTagInput}
+                    onChange={e => setCustomTagInput(e.target.value)}
+                    placeholder="Enter custom domain..."
+                    className="input"
+                    style={{ flex: 1 }}
+                    onKeyDown={e => e.key === 'Enter' && handleAddCustomTag()}
+                  />
+                  <button className="btn btn-primary" onClick={handleAddCustomTag}>Add</button>
+                </div>
+              )}
 
               <button 
                 className="btn btn-primary" 
