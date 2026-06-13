@@ -63,7 +63,19 @@ export default function Navbar({ user }: { user?: { name: string, email: string 
                     fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', userSelect: 'none'
                   }}
                 >
-                  {localUser.name ? localUser.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U'}
+                  {(() => {
+                    const name = localUser.name || '';
+                    if (!name) return 'U';
+                    const parts = name.trim().split(' ');
+                    if (parts.length === 1) {
+                      return parts[0].length > 1 
+                        ? (parts[0][0] + parts[0][parts[0].length - 1]).toUpperCase() 
+                        : parts[0][0].toUpperCase();
+                    }
+                    const first = parts[0];
+                    const last = parts[parts.length - 1];
+                    return (first[0] + last[last.length - 1]).toUpperCase();
+                  })()}
                 </div>
                 {avatarOpen && (
                   <div className="avatar-dropdown" style={{

@@ -17,9 +17,21 @@ export default function Sidebar({ user }: { user?: { name: string, email: string
     }
   }, [user])
   
-  // Default to Arjun Mehta if no user (for preview purposes)
-  const displayName = localUser?.name || "Arjun Mehta"
-  const initials = displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+  const displayName = localUser?.name || ""
+  
+  // First letter of first name + last letter of last name
+  let initials = ""
+  if (displayName) {
+    const parts = displayName.trim().split(' ')
+    if (parts.length === 1) {
+      const name = parts[0]
+      initials = name.length > 1 ? (name[0] + name[name.length - 1]).toUpperCase() : name[0].toUpperCase()
+    } else {
+      const first = parts[0]
+      const last = parts[parts.length - 1]
+      initials = (first[0] + last[last.length - 1]).toUpperCase()
+    }
+  }
 
   return (
     <aside className="sidebar">
@@ -41,13 +53,15 @@ export default function Sidebar({ user }: { user?: { name: string, email: string
         </Link>
       </nav>
       
-      <div className="sidebar-user">
-        <div className="sidebar-user-avatar">{initials}</div>
-        <div className="sidebar-user-info">
-          <div className="sidebar-user-name">{displayName}</div>
-          <div className="sidebar-user-score">Score: 72 · 1.2× weight</div>
+      {localUser && (
+        <div className="sidebar-user">
+          <div className="sidebar-user-avatar">{initials}</div>
+          <div className="sidebar-user-info">
+            <div className="sidebar-user-name">{displayName}</div>
+            <div className="sidebar-user-score">Score: 72 · 1.2× weight</div>
+          </div>
         </div>
-      </div>
+      )}
     </aside>
   )
 }
