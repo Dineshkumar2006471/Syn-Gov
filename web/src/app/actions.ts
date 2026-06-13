@@ -162,7 +162,7 @@ export async function createProposal(data: any) {
             authorName: author.name || 'A community member',
             proposalTitle: data.title,
             aiSummary: data.aiSummary?.what || data.description?.substring(0, 120) || data.title,
-            budget: data.budget,
+            category: data.category || 'general',
             proposalUrl: `${APP_URL}/proposals/${result[0].id}`,
           })
         })

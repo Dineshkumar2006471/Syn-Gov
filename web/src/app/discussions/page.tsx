@@ -59,7 +59,7 @@ export default function Discussions() {
         // Fetch the user name for the new message
         const { data: userData } = await supabase.from('users').select('name').eq('id', payload.new.user_id).single()
         
-        const newMessageWithUser = {
+        const newMessageWithUser: any = {
           ...payload.new,
           users: userData || { name: 'Unknown' }
         }
