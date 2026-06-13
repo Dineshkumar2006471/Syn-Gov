@@ -71,7 +71,7 @@ export default function Login() {
       <div className="login-form-side">
         <div className="login-form-container">
           <Link href="/" className="navbar-logo" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '48px' }}>
-            <img src="/images/syn-gov-logo.png" alt="SynGov Logo" style={{ height: '128px', width: 'auto' }} />
+            <img src="/images/syn-gov-logo.png" alt="SynGov Logo" style={{ height: '60px', width: 'auto' }} />
           </Link>
 
           <h2 className="text-h2">{isSignUp ? 'Create an account' : 'Welcome back'}</h2>

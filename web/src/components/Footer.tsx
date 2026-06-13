@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="footer-grid">
           <div>
             <div className="footer-logo" style={{ marginBottom: '8px' }}>
-              <img src="/images/syn-gov-logo.png" alt="SynGov Logo" style={{ height: '128px', width: 'auto' }} />
+              <img src="/images/syn-gov-logo.png" alt="SynGov Logo" style={{ height: '60px', width: 'auto' }} />
             </div>
             <p className="footer-tagline">Smarter decision-making for college communities. Built with AI, secured by blockchain.</p>
           </div>
