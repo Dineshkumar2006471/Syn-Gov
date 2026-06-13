@@ -32,7 +32,7 @@ const contractAddress = process.env.CONTRACT_ADDRESS || '0x5FbDB2315678afecb367f
 const loggerContract = new ethers.Contract(contractAddress, contractABI, wallet)
 
 // ── App URL ─────────────────────────────────────────────────
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://syn-3cqg104tf-bingi-dinesh-kumars-projects.vercel.app'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://syn-gov.vercel.app'
 
 // ── Helper: fetch all member emails ─────────────────────────
 async function getAllMemberEmails(): Promise<{ email: string; name: string }[]> {

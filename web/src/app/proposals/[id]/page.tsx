@@ -47,32 +47,39 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
         setProposal(propData)
       }
 
-      // 2. Fetch logged in user
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user?.email) {
-        const { data: profile } = await supabase
-          .from('users')
-          .select('*')
-          .eq('email', session.user.email)
-          .single()
-        
-        if (profile) {
-          setUserProfile(profile)
-          
-          // 3. Check if user already voted
-          if (propData) {
-            const { data: vote } = await supabase
-              .from('votes')
+      // 2. Fetch logged-in user from our cookie-based auth
+      try {
+        const res = await fetch('/api/me')
+        if (res.ok) {
+          const cookieUser = await res.json()
+          if (cookieUser?.email) {
+            const { data: profile } = await supabase
+              .from('users')
               .select('*')
-              .eq('proposal_id', propData.id)
-              .eq('user_id', profile.id)
+              .eq('email', cookieUser.email)
               .single()
             
-            if (vote) {
-              setUserVoteRecord(vote)
+            if (profile) {
+              setUserProfile(profile)
+              
+              // 3. Check if user already voted
+              if (propData) {
+                const { data: vote } = await supabase
+                  .from('votes')
+                  .select('*')
+                  .eq('proposal_id', propData.id)
+                  .eq('user_id', profile.id)
+                  .single()
+                
+                if (vote) {
+                  setUserVoteRecord(vote)
+                }
+              }
             }
           }
         }
+      } catch (e) {
+        console.log('User not logged in or fetch failed')
       }
 
       setLoading(false)
@@ -82,10 +89,11 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
 
   const handlePostComment = () => {
     if (!newComment.trim()) return
+    const initials = userProfile ? userProfile.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : 'ME'
     const newEntry = {
       id: Date.now(),
-      author: 'You',
-      avatar: 'AM',
+      author: userProfile?.name || 'You',
+      avatar: initials,
       time: 'Just now',
       text: newComment
     }
@@ -151,8 +159,12 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
                   <span>Proposed by <strong style={{color: 'var(--text-primary)'}}>Community Member</strong></span>
                   <span>·</span>
                   <span>{new Date(proposal.created_at).toLocaleDateString()}</span>
-                  <span>·</span>
-                  <span>Closes {new Date(new Date(proposal.created_at).getTime() + 30*24*60*60*1000).toLocaleDateString()}</span>
+                  {proposal.deadline && (
+                    <>
+                      <span>·</span>
+                      <span>Closes {new Date(proposal.deadline).toLocaleDateString()}</span>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -223,7 +235,9 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
                 </div>
 
                 <div style={{display: 'flex', gap: '12px'}}>
-                  <div className="comment-avatar" style={{background: 'var(--accent)', color: '#fff'}}>AM</div>
+                  <div className="comment-avatar" style={{background: 'var(--accent)', color: '#fff'}}>
+                    {userProfile ? userProfile.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : 'ME'}
+                  </div>
                   <div style={{flex: 1}}>
                     <textarea 
                       className="textarea" 
@@ -248,7 +262,7 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
 
             <div className="detail-right" style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
               
-              {/* ── VOTING PANEL REPLACEMENT ── */}
+              {/* ── VOTING PANEL ── */}
               {userProfile ? (
                 <VotingPanel 
                   proposalId={proposal.id}
@@ -269,7 +283,7 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
                 />
               ) : (
                 <div className="card-flat" style={{textAlign: 'center', padding: '32px 16px'}}>
-                  <p style={{color: 'var(--text-muted)'}}>Please log in to view and participate in governance voting.</p>
+                  <p style={{color: 'var(--text-muted)'}}>Please <Link href="/login" style={{color: 'var(--accent)', fontWeight: 600}}>log in</Link> to view and participate in governance voting.</p>
                 </div>
               )}
 
@@ -299,7 +313,6 @@ export default function ProposalDetail({ params }: { params: Promise<{ id: strin
                 </div>
               </div>
 
-              {/* Only show the blockchain manual link if the VotingPanel isn't already showing the banner with the link */}
               {(!proposal.tx_hash) && (
                 <div className="card-flat" style={{borderColor: 'var(--accent-muted)', background: 'var(--accent-light)'}}>
                   <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px'}}>
