@@ -69,7 +69,8 @@ export function calculateFinalWeight(
   contributionScore: number,
   expertiseBonus: number
 ): number {
-  const base = contributionScore / 100;
+  // Matches database logic: 0.5 + (score / 500) * 1.5
+  const base = 0.5 + (contributionScore / 500.0) * 1.5;
   const raw = base + expertiseBonus;
   return Math.min(Math.max(raw, 0.5), 2.0);
 }
