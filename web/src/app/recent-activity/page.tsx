@@ -3,7 +3,7 @@ import Sidebar from '@/components/Sidebar'
 import BottomNav from "@/components/BottomNav"
 import { supabase } from '@/lib/supabase'
 import { getUser } from '@/app/auth-actions'
-import RecentActivityClient from './RecentActivityClient'
+import RecentActivityClient from './recent-activity-client'
 
 export const revalidate = 0;
 
